@@ -29,7 +29,7 @@
   always_run: yes
 
 - set_fact:
-    opencontrail_config_http_proxy_host: "{{ opencontrail_http_proxy | regex_replace('[a-z]+://([a-zA-Z0-9][a-zA-Z0-9\\.\\-_]{0,62})(:[0-9]+)?', '\\\\1') }}"
+    opencontrail_config_http_proxy_host: "{{ opencontrail_http_proxy | regex_replace('[a-z]+://([a-zA-Z0-9][a-zA-Z0-9\\.\\-_]{0,62})(:[0-9]+)?', '\\1') }}"
   when: opencontrail_http_proxy is defined
 
 - set_fact:
