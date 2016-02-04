@@ -11,7 +11,9 @@
     - debug: var=_xmpp_sessions.stdout
     - set_fact:
         xmpp_session_count: "{{ _xmpp_sessions.stdout_lines | length }}"
+        node_count: "{{ groups['nodes'] | length + (0 if groups['gateways'] is not defined else (groups['gateways'] | length)) }}"
     - debug: var=xmpp_session_count
+    - debug: var=node_count
 
     # workaround control-node ifmap bug.
     - name: Determine control-node docker id
@@ -28,15 +30,16 @@
 
     - name: Restart control-node
       command: docker restart "{{ _control_status.stdout }}"
-      when: xmpp_session_count|int != 3 and _control_status.stdout != "" and _control_logs_nofqnset.rc == 0
+      when: xmpp_session_count|int != node_count|int and _control_status.stdout != "" and _control_logs_nofqnset.rc == 0 and kube_network_plugin == "opencontrail"
 
     - assert:
         that:
-          - xmpp_session_count|int == 3
+          - xmpp_session_count|int == node_count|int 
+      when: kube_network_plugin == "opencontrail"
 
     # Ensure that the DNS resolver is operational
     - name: Check kube-system pods
-      shell: "kubectl --namespace=kube-system get pods | awk '/kube-dns-v/{ print $2 ;}'"
+      shell: "kubectl --namespace=kube-system get pods | awk '/kubedns-/{ print $2 ;}'"
       register: dns_status
 
     - assert:
