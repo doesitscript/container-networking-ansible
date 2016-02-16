@@ -92,3 +92,8 @@
      src: "{{ opencontrail_plugin_path }}"
      dest: /usr/libexec/kubernetes/kubelet-plugins/net/exec/opencontrail/opencontrail
      state: link
+  notify:
+    - restart kubelet
+
+- meta: flush_handlers
+
