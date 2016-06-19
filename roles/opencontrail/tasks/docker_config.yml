@@ -1,4 +1,17 @@
 ---
+- name: Set docker daemon options
+  template:
+    src: docker
+    dest: "/etc/sysconfig/docker-network"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart docker
+  when: ansible_os_family != "CoreOS"
+
+- meta: flush_handlers
+
 - name: Disable usage of iptables by docker
   lineinfile:
     dest: /etc/sysconfig/docker-network
